@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation"
 import Profile from "./Profile"
 
 
-const ProfileContent = () => {
+const ProfileContent = ({ id }) => {
     const router = useRouter()
     const { data: session } = useSession()
     const [myPosts, setMyPosts] = useState(null)
-
+    const [user, setUser] = useState(null)
     const handleEdit = (post) => {
         router.push(`/update-prompt?id=${post._id}`)
     }
@@ -34,18 +34,28 @@ const ProfileContent = () => {
 
     useEffect(() => {
         const fetchPrompts = async () => {
-            const response = await fetch(`/api/users/${session?.user.id}/posts`)
+            const response = await fetch(`/api/users/${id}/posts`)
             const data = await response.json()
-
             setMyPosts(data)
         }
-        if (session?.user.id) {
+
+        const fetchUser = async () => {
+            const response = await fetch(`/api/users/${id}`)
+            const data = await response.json()
+            setUser(data)
+        }
+
+        if (id !== session?.user.id) {
+            fetchUser()
+        }
+
+        if (id) {
             fetchPrompts()
         }
-    }, [session?.user.id])
+    }, [id, session?.user.id])
 
     return (
-        <Profile name="My" data={myPosts} handleEdit={handleEdit} handleDelete={handleDelete} desc="Welcome to your personalized profile page" />
+        <Profile name={id === session?.user.id && "My"} data={myPosts} handleEdit={handleEdit} handleDelete={handleDelete} desc={`Welcome to ${id === session?.user.id ? 'your personalized' : `${user?.username}'s`} profile page`} />
     )
 }
 export default ProfileContent

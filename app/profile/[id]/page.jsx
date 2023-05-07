@@ -1,9 +1,9 @@
 import ProfileContent from "@/components/ProfileContent"
 
-const page = () => {
+const page = ({ params }) => {
 
     return (
-        <ProfileContent />
+        <ProfileContent id={params.id} />
     )
 }
 export default page

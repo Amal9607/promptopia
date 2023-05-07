@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { signIn, signOut, useSession, getProviders } from 'next-auth/react'
+import { sendError } from "next/dist/server/api-utils";
 
 const Nav = () => {
     const { data: session } = useSession()
@@ -31,9 +32,8 @@ const Nav = () => {
                     <div className="flex gap-3 md:gap-5">
                         <Link href="/create-prompt" className="black_btn">Create Post</Link>
                         <button type="button" onClick={signOut} className="outline_btn">Sign Out</button>
-                        <Link href="/profile">
+                        <Link href={`/profile/${session?.user.id}`}>
                             <Image src={session?.user.image} width={37} height={37} alt="profile" className="rounded-full" />
-
                         </Link>
                     </div>
                 ) : (
@@ -54,7 +54,7 @@ const Nav = () => {
                         <Image src={session?.user.image} width={37} height={37} alt="profile" onClick={() => { setToggleDropDown((prev) => !prev) }} className="rounded-full cursor-pointer" />
                         {toggleDropDown && (
                             <div className="dropdown">
-                                <Link href="/profile" className="dropdown_link" onClick={() => { setToggleDropDown(false) }}>My Profile</Link>
+                                <Link href={`/profile/${session?.user.id}`} className="dropdown_link" onClick={() => { setToggleDropDown(false) }}>My Profile</Link>
                                 <Link href="/create-prompt" className="dropdown_link" onClick={() => { setToggleDropDown(false) }}>Create Prompt</Link>
                                 <button type="button" onClick={() => {
                                     setToggleDropDown(false)

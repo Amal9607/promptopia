@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import PromptCard from "./PromptCard"
 
 const PromptCardList = ({ data, handleTagClick }) => {
@@ -19,8 +19,19 @@ const Feed = () => {
   const [posts, setPosts] = useState(null)
 
   const handleSearchInput = (e) => {
-    setSearchText()
+    setSearchText(e.target.value)
   }
+
+  const filteredPost = useMemo(() => {
+    if (!posts) {
+      return []
+    }
+    return posts.filter((post) => post.prompt.includes(searchText) || post.creator.username.includes(searchText) || post.tag.includes(searchText))
+  }, [searchText, posts])
+
+  const handleTagClick = useCallback((tag) => {
+    setSearchText(tag)
+  }, [setSearchText])
 
   useEffect(() => {
     const fetchPrompts = async () => {
@@ -36,9 +47,8 @@ const Feed = () => {
     <section className="feed">
       <form className="relative w-full flex-center">
         <input type="search" placeholder="Search for a username or a tag" value={searchText} onInput={handleSearchInput} className="search_input peer" />
-
       </form>
-      {posts && <PromptCardList data={posts} handleTagClick={() => { }} />}
+      {posts && <PromptCardList data={filteredPost} handleTagClick={handleTagClick} />}
     </section>
   )
 }
